@@ -20,7 +20,7 @@ go build
 To lauch golang test, you can use the folowing command line:
 ```bash
 docker-compose up -d
-go test -v ./...
+make test
 ```
 
 ## CLI
