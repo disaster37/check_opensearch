@@ -2,8 +2,6 @@ package check
 
 import (
 	"context"
-	"fmt"
-	"strings"
 	"time"
 
 	nagiosPlugin "github.com/disaster37/go-nagios"
@@ -53,6 +51,27 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 	log.Debugf("snapshotRepositoryName: %s", snapshotRepositoryName)
 	monitoringData := nagiosPlugin.NewMonitoring()
 
+	// Because of bug on Opensearch, I use first the cat api, then I get status for failed snapshot
+	// Look  issue: https://github.com/opensearch-project/OpenSearch/issues/13079
+	snapshotCatResp, err := h.client.CatSnapshots().Repository(snapshotRepositoryName).Do(context.Background())
+	if err != nil {
+		if opensearch.IsNotFound(err) {
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
+			monitoringData.AddMessage("Repository %s not found", snapshotRepositoryName)
+			return monitoringData, nil
+		}
+
+		return nil, err
+	}
+
+	if len(snapshotCatResp) == 0 {
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
+		monitoringData.AddMessage("No snapshot on repository %s", snapshotRepositoryName)
+		monitoringData.AddPerfdataOrDie("NbSnapshot", 0, "")
+		monitoringData.AddPerfdataOrDie("NbSnapshotFailed", 0, "")
+		return monitoringData, nil
+	}
+
 	if snapshotRepositoryName != "" {
 		if _, err := h.client.SnapshotGetRepository(snapshotRepositoryName).Do(context.Background()); err != nil {
 			if opensearch.IsNotFound(err) {
@@ -64,49 +83,71 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 		}
 	}
 
-	snapshotStatusResp, err := h.client.SnapshotStatus().Repository(snapshotRepositoryName).Snapshot("_all").Do(context.Background())
-	if err != nil {
-		if opensearch.IsNotFound(err) {
-			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
-			monitoringData.AddMessage("Repository %s not found", snapshotRepositoryName)
-			return monitoringData, nil
-		}
-
-		return nil, err
-	}
-
-	// Check if there are some snapshot failed
-	if (snapshotStatusResp.Snapshots == nil) || (len(snapshotStatusResp.Snapshots) == 0) {
-		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
-		monitoringData.AddMessage("No snapshot on repository %s", snapshotRepositoryName)
-		monitoringData.AddPerfdataOrDie("NbSnapshot", 0, "")
-		monitoringData.AddPerfdataOrDie("NbSnapshotFailed", 0, "")
-		return monitoringData, nil
-	}
-
 	nbSnapshot := 0
-	snapshotsFailed := make([]opensearch.SnapshotStatus, 0)
-	for _, snapshotResponse := range snapshotStatusResp.Snapshots {
-		nbSnapshot++
-		if snapshotResponse.State != "SUCCESS" && snapshotResponse.State != "IN_PROGRESS" {
+	snapshotsFailed := make([]opensearch.CatSnapshotsResponseRow, 0)
+	for _, snapshot := range snapshotCatResp {
+		if snapshot.Status != "SUCCESS" && snapshot.Status != "IN_PROGRESS" {
+			nbSnapshot++
 			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
-			snapshotsFailed = append(snapshotsFailed, snapshotResponse)
+			snapshotsFailed = append(snapshotsFailed, snapshot)
 		}
 	}
+
 	if len(snapshotsFailed) > 0 {
 		monitoringData.AddMessage("Some snapshots failed (%d/%d)", nbSnapshot-len(snapshotsFailed), nbSnapshot)
 		for _, snapshotFailed := range snapshotsFailed {
-
-			var errorMsg strings.Builder
-			for _, failure := range snapshotFailed.Failures {
-				errorMsg.WriteString(fmt.Sprintf("\n\tIndice %s on node %s failed with status %s: %s", failure.Indice, failure.NodeID, failure.Status, failure.Reason))
-			}
-
-			monitoringData.AddMessage("Snapshot %s failed (%s - %s) with status %s: %s", snapshotFailed.Snapshot, snapshotFailed.StartTime, snapshotFailed.EndTime, snapshotFailed.State, errorMsg.String())
+			monitoringData.AddMessage("Snapshot %s failed (%s - %s) with status %s: %s", snapshotFailed.ID, snapshotFailed.StartTime, snapshotFailed.EndTime, snapshotFailed.Status, snapshotFailed.Reason)
 		}
 	} else {
 		monitoringData.AddMessage("All snapshots are ok (%d/%d)", nbSnapshot, nbSnapshot)
 	}
+
+	/*
+		snapshotStatusResp, err := h.client.SnapshotStatus().Repository(snapshotRepositoryName).Snapshot("_all").Do(context.Background())
+		if err != nil {
+			if opensearch.IsNotFound(err) {
+				monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
+				monitoringData.AddMessage("Repository %s not found", snapshotRepositoryName)
+				return monitoringData, nil
+			}
+
+			return nil, err
+		}
+
+		// Check if there are some snapshot failed
+		if (snapshotStatusResp.Snapshots == nil) || (len(snapshotStatusResp.Snapshots) == 0) {
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
+			monitoringData.AddMessage("No snapshot on repository %s", snapshotRepositoryName)
+			monitoringData.AddPerfdataOrDie("NbSnapshot", 0, "")
+			monitoringData.AddPerfdataOrDie("NbSnapshotFailed", 0, "")
+			return monitoringData, nil
+		}
+
+		nbSnapshot := 0
+		snapshotsFailed := make([]opensearch.SnapshotStatus, 0)
+		for _, snapshotResponse := range snapshotStatusResp.Snapshots {
+			nbSnapshot++
+			if snapshotResponse.State != "SUCCESS" && snapshotResponse.State != "IN_PROGRESS" {
+				monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
+				snapshotsFailed = append(snapshotsFailed, snapshotResponse)
+			}
+		}
+		if len(snapshotsFailed) > 0 {
+			monitoringData.AddMessage("Some snapshots failed (%d/%d)", nbSnapshot-len(snapshotsFailed), nbSnapshot)
+			for _, snapshotFailed := range snapshotsFailed {
+
+				var errorMsg strings.Builder
+				for _, failure := range snapshotFailed.Failures {
+					errorMsg.WriteString(fmt.Sprintf("\n\tIndice %s on node %s failed with status %s: %s", failure.Indice, failure.NodeID, failure.Status, failure.Reason))
+				}
+
+				monitoringData.AddMessage("Snapshot %s failed (%s - %s) with status %s: %s", snapshotFailed.Snapshot, snapshotFailed.StartTime, snapshotFailed.EndTime, snapshotFailed.State, errorMsg.String())
+			}
+		} else {
+			monitoringData.AddMessage("All snapshots are ok (%d/%d)", nbSnapshot, nbSnapshot)
+		}
+
+	*/
 
 	monitoringData.AddPerfdataOrDie("NbSnapshot", nbSnapshot, "")
 	monitoringData.AddPerfdataOrDie("NbSnapshotFailed", len(snapshotsFailed), "")
