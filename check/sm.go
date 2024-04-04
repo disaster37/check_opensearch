@@ -56,7 +56,7 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 	if snapshotRepositoryName != "" {
 		if _, err := h.client.SnapshotGetRepository(snapshotRepositoryName).Do(context.Background()); err != nil {
 			if opensearch.IsNotFound(err) {
-				monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+				monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 				monitoringData.AddMessage("Repository %s not found", snapshotRepositoryName)
 				return monitoringData, nil
 			}
@@ -67,7 +67,7 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 	snapshotStatusResp, err := h.client.SnapshotStatus().Repository(snapshotRepositoryName).Snapshot("_all").Do(context.Background())
 	if err != nil {
 		if opensearch.IsNotFound(err) {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 			monitoringData.AddMessage("Repository %s not found", snapshotRepositoryName)
 			return monitoringData, nil
 		}
@@ -77,10 +77,10 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 
 	// Check if there are some snapshot failed
 	if (snapshotStatusResp.Snapshots == nil) || (len(snapshotStatusResp.Snapshots) == 0) {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_OK)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
 		monitoringData.AddMessage("No snapshot on repository %s", snapshotRepositoryName)
-		monitoringData.AddPerfdata("NbSnapshot", 0, "")
-		monitoringData.AddPerfdata("NbSnapshotFailed", 0, "")
+		monitoringData.AddPerfdataOrDie("NbSnapshot", 0, "")
+		monitoringData.AddPerfdataOrDie("NbSnapshotFailed", 0, "")
 		return monitoringData, nil
 	}
 
@@ -89,7 +89,7 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 	for _, snapshotResponse := range snapshotStatusResp.Snapshots {
 		nbSnapshot++
 		if snapshotResponse.State != "SUCCESS" && snapshotResponse.State != "IN_PROGRESS" {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_CRITICAL)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
 			snapshotsFailed = append(snapshotsFailed, snapshotResponse)
 		}
 	}
@@ -108,8 +108,8 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 		monitoringData.AddMessage("All snapshots are ok (%d/%d)", nbSnapshot, nbSnapshot)
 	}
 
-	monitoringData.AddPerfdata("NbSnapshot", nbSnapshot, "")
-	monitoringData.AddPerfdata("NbSnapshotFailed", len(snapshotsFailed), "")
+	monitoringData.AddPerfdataOrDie("NbSnapshot", nbSnapshot, "")
+	monitoringData.AddPerfdataOrDie("NbSnapshotFailed", len(snapshotsFailed), "")
 
 	return monitoringData, nil
 }
@@ -122,7 +122,7 @@ func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monit
 	if policyName != "" {
 		if _, err := h.client.SmGetPolicy(policyName).Do(context.Background()); err != nil {
 			if opensearch.IsNotFound(err) {
-				monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+				monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 				monitoringData.AddMessage("Policy %s not found", policyName)
 				return monitoringData, nil
 			}
@@ -138,10 +138,10 @@ func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monit
 	}
 	if err != nil {
 		if opensearch.IsNotFound(err) {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_OK)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
 			monitoringData.AddMessage("No SM policy %s", policyName)
-			monitoringData.AddPerfdata("NbSMPolicyt", 0, "")
-			monitoringData.AddPerfdata("NbSMPolicyFailed", 0, "")
+			monitoringData.AddPerfdataOrDie("NbSMPolicyt", 0, "")
+			monitoringData.AddPerfdataOrDie("NbSMPolicyFailed", 0, "")
 			return monitoringData, nil
 		}
 		return nil, err
@@ -149,10 +149,10 @@ func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monit
 
 	// Check if there are some SLM policy failed
 	if len(explainSmRes.Policies) == 0 {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_OK)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
 		monitoringData.AddMessage("No SM policy %s", policyName)
-		monitoringData.AddPerfdata("NbSMPolicyt", 0, "")
-		monitoringData.AddPerfdata("NbSMPolicyFailed", 0, "")
+		monitoringData.AddPerfdataOrDie("NbSMPolicyt", 0, "")
+		monitoringData.AddPerfdataOrDie("NbSMPolicyFailed", 0, "")
 		return monitoringData, nil
 	}
 
@@ -162,11 +162,11 @@ func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monit
 	for _, policy := range explainSmRes.Policies {
 		nbSLMPolicy++
 		if policy.Creation != nil && (policy.Creation.LatestExecution.Status == "FAILED" || policy.Creation.LatestExecution.Status == "TIME_LIMIT_EXCEEDED") {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_CRITICAL)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
 			slmPoliciesFailedCreation[policy.Name] = policy
 		}
 		if policy.Deletion != nil && (policy.Deletion.LatestExecution.Status == "FAILED" || policy.Deletion.LatestExecution.Status == "TIME_LIMIT_EXCEEDED") {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_CRITICAL)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
 			slmPoliciesFailedDeletion[policy.Name] = policy
 		}
 	}
@@ -188,8 +188,8 @@ func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monit
 		monitoringData.AddMessage("All SM policies are ok (%d/%d)", nbSLMPolicy, nbSLMPolicy)
 	}
 
-	monitoringData.AddPerfdata("NbSMPolicy", nbSLMPolicy, "")
-	monitoringData.AddPerfdata("NbSMPolicyFailed", len(slmPoliciesFailedCreation)+len(slmPoliciesFailedDeletion), "")
+	monitoringData.AddPerfdataOrDie("NbSMPolicy", nbSLMPolicy, "")
+	monitoringData.AddPerfdataOrDie("NbSMPolicyFailed", len(slmPoliciesFailedCreation)+len(slmPoliciesFailedDeletion), "")
 
 	return monitoringData, nil
 }

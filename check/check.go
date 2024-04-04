@@ -4,10 +4,10 @@ import (
 	"crypto/tls"
 	"net/http"
 
+	"emperror.dev/errors"
 	nagiosPlugin "github.com/disaster37/go-nagios"
 	"github.com/disaster37/opensearch/v2"
 	"github.com/disaster37/opensearch/v2/config"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"k8s.io/utils/ptr"

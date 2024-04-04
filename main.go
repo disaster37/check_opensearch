@@ -160,7 +160,7 @@ func main() {
 	err := run(os.Args)
 	if err != nil {
 		monitoringData := nagiosPlugin.NewMonitoring()
-		monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 		monitoringData.AddMessage("Error appear during check: %s", err)
 		monitoringData.ToSdtOut()
 	}

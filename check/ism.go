@@ -38,7 +38,7 @@ func (h *DefaultCheck) CheckISMError(indiceName string, excludeIndices []string)
 	explainResp, err := h.client.IsmExplainPolicy(indiceName).Do(context.Background())
 	if err != nil {
 		if opensearch.IsStatusCode(err, http.StatusBadRequest) {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 			monitoringData.AddMessage("Indice %s not found", indiceName)
 			return monitoringData, nil
 		}
@@ -47,9 +47,9 @@ func (h *DefaultCheck) CheckISMError(indiceName string, excludeIndices []string)
 
 	// Check if there are some ILM polices that failed
 	if explainResp.TotalManagedIndices == 0 {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_OK)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
 		monitoringData.AddMessage("No error found on indice %s", indiceName)
-		monitoringData.AddPerfdata("NbIndiceFailed", 0, "")
+		monitoringData.AddPerfdataOrDie("NbIndiceFailed", 0, "")
 		return monitoringData, nil
 	}
 
@@ -63,9 +63,9 @@ func (h *DefaultCheck) CheckISMError(indiceName string, excludeIndices []string)
 
 	// Compute error
 	if len(explainResp.Indexes) == 0 {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_OK)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
 		monitoringData.AddMessage("No error found on indice %s", indiceName)
-		monitoringData.AddPerfdata("NbIndiceFailed", 0, "")
+		monitoringData.AddPerfdataOrDie("NbIndiceFailed", 0, "")
 		return monitoringData, nil
 	}
 
@@ -79,10 +79,10 @@ func (h *DefaultCheck) CheckISMError(indiceName string, excludeIndices []string)
 	}
 
 	if nbFailedIndex > 0 {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_CRITICAL)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
 	}
 
-	monitoringData.AddPerfdata("NbIndiceFailed", nbFailedIndex, "")
+	monitoringData.AddPerfdataOrDie("NbIndiceFailed", nbFailedIndex, "")
 
 	return monitoringData, nil
 }

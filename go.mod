@@ -4,11 +4,10 @@ go 1.20
 
 require (
 	emperror.dev/errors v0.8.1
-	github.com/disaster37/go-nagios v0.0.0-20181030163601-23b2945af699
+	github.com/disaster37/go-nagios v0.0.2
 	github.com/disaster37/opensearch/v2 v2.0.6-0.20240404091059-0be2c76d42b8
-	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2
 	k8s.io/utils v0.0.0-20240310230437-4693a0247e57
@@ -25,6 +24,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.32.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect

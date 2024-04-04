@@ -42,7 +42,7 @@ func (h *DefaultCheck) CheckTransformError(transformName string, excludeTransfor
 		Do(context.Background())
 	if err != nil {
 		if opensearch.IsNotFound(err) {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 			monitoringData.AddMessage("Transform %s not found", transformName)
 			return monitoringData, nil
 		}
@@ -51,7 +51,7 @@ func (h *DefaultCheck) CheckTransformError(transformName string, excludeTransfor
 
 	// Handle not found transform when id is provided
 	if len(resSearch.Transforms) == 0 && transformName != "_all" && transformName != "*" {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 		monitoringData.AddMessage("Transform %s not found", transformName)
 		return monitoringData, nil
 	}
@@ -87,7 +87,7 @@ func (h *DefaultCheck) CheckTransformError(transformName string, excludeTransfor
 				continue
 			} else {
 				nbTranformFailed++
-				monitoringData.SetStatus(nagiosPlugin.STATUS_CRITICAL)
+				monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
 				monitoringData.AddMessage("Transform %s %s: %s", explain[transform.Id].TransformId, explain[transform.Id].Status, explain[transform.Id].FailureReason)
 				continue
 			}
@@ -95,9 +95,9 @@ func (h *DefaultCheck) CheckTransformError(transformName string, excludeTransfor
 
 	}
 
-	monitoringData.AddPerfdata("nbTransformFailed", nbTranformFailed, "")
-	monitoringData.AddPerfdata("nbTransformStopped", nbTransformStopped, "")
-	monitoringData.AddPerfdata("nbTransformStarted", nbTransformStarted, "")
+	monitoringData.AddPerfdataOrDie("nbTransformFailed", nbTranformFailed, "")
+	monitoringData.AddPerfdataOrDie("nbTransformStopped", nbTransformStopped, "")
+	monitoringData.AddPerfdataOrDie("nbTransformStarted", nbTransformStarted, "")
 
 	if monitoringData.Status() == nagiosPlugin.STATUS_OK {
 		if transformName == "_all" || transformName == "*" {

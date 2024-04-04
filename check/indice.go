@@ -3,9 +3,9 @@ package check
 import (
 	"context"
 
+	"emperror.dev/errors"
 	nagiosPlugin "github.com/disaster37/go-nagios"
 	"github.com/disaster37/opensearch/v2"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
@@ -39,7 +39,7 @@ func (h *DefaultCheck) CheckIndiceLocked(indiceName string) (monitoringData *nag
 	res, err := h.client.IndexGetSettings(indiceName).Do(context.Background())
 	if err != nil {
 		if opensearch.IsNotFound(err) {
-			monitoringData.SetStatus(nagiosPlugin.STATUS_UNKNOWN)
+			monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
 			monitoringData.AddMessage("Indice %s not found", indiceName)
 			return monitoringData, nil
 		}
@@ -64,19 +64,19 @@ func (h *DefaultCheck) CheckIndiceLocked(indiceName string) (monitoringData *nag
 	}
 
 	if len(brokenIndices) > 0 {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_CRITICAL)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_CRITICAL)
 		monitoringData.AddMessage("There are some indice locked (%d/%d)", nbIndice-len(brokenIndices), nbIndice)
 		for _, indiceName := range brokenIndices {
 			monitoringData.AddMessage("\tIndice %s", indiceName)
 		}
 
 	} else {
-		monitoringData.SetStatus(nagiosPlugin.STATUS_OK)
+		monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_OK)
 		monitoringData.AddMessage("No indice locked (%d/%d)", nbIndice, nbIndice)
 	}
 
-	monitoringData.AddPerfdata("nbIndices", nbIndice, "")
-	monitoringData.AddPerfdata("nbIndicesLocked", len(brokenIndices), "")
+	monitoringData.AddPerfdataOrDie("nbIndices", nbIndice, "")
+	monitoringData.AddPerfdataOrDie("nbIndicesLocked", len(brokenIndices), "")
 
 	return monitoringData, nil
 }
