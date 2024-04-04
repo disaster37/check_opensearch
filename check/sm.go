@@ -2,6 +2,7 @@ package check
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	nagiosPlugin "github.com/disaster37/go-nagios"
@@ -160,6 +161,16 @@ func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monit
 	log.Debugf("policyName: %s", policyName)
 	monitoringData := nagiosPlugin.NewMonitoring()
 
+	if policyName != "" && !strings.Contains(policyName, "*") {
+		if _, err := h.client.SmGetPolicy(policyName).Do(context.Background()); err != nil {
+			if opensearch.IsNotFound(err) {
+				monitoringData.SetStatusOrDie(nagiosPlugin.STATUS_UNKNOWN)
+				monitoringData.AddMessage("Policy %s not found", policyName)
+				return monitoringData, nil
+			}
+			return nil, err
+		}
+	}
 
 	explainSmRes, err := h.client.SmExplainPolicy(policyName).Do(context.Background())
 	if err != nil {

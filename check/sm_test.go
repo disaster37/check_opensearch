@@ -23,7 +23,7 @@ func (s *CheckESTestSuite) TestCheckSMError() {
 func (s *CheckESTestSuite) TestCheckSLMPolicy() {
 
 	// When policy exist
-	monitoringData, err := s.check.CheckSMPolicy("")
+	monitoringData, err := s.check.CheckSMPolicy("*")
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), monitoringData)
 	assert.Equal(s.T(), nagiosPlugin.STATUS_OK, monitoringData.Status())
