@@ -5,7 +5,7 @@ go 1.20
 require (
 	emperror.dev/errors v0.8.1
 	github.com/disaster37/go-nagios v0.0.2
-	github.com/disaster37/opensearch/v2 v2.0.6-0.20240404091059-0be2c76d42b8
+	github.com/disaster37/opensearch/v2 v2.0.6
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
 	github.com/urfave/cli/v2 v2.27.1

@@ -50,7 +50,7 @@ Command `check-indice-locked` permit to check if indice provided is not locked b
 If you should to check all indice, you can put `_all` as indice name.
 
 You need to set the following parameters:
-- **--indice**: The indice name to check
+- **--indice**: The indice name to check. Default to `_all`
 
 It return the following perfdata:
 - **nbIndices**: the number of indices returned
@@ -74,7 +74,7 @@ Command `check-ism-indice` permit to check if ISM policy failed on given indice.
 If you should to check all indice, you can put `_all` as indice name.
 
 You need to set the following parameters:
-- **--indice**: The indice name
+- **--indice**: The indice name. Default to `_all`
 - **--exclude**: (optional) The indice name you should to exclude
 
 It return the following perfdata:
@@ -117,7 +117,7 @@ OK - No snapshot on repository snapshot|NbSnapshot=0;;;; NbSnapshotFailed=0;;;;
 Command `check-sm-policy` permit to check if there are SM policies error.
 
 You can to set the following parameters if you should to check only one policy:
-- **--name**: The policy name you should to check
+- **--name**: The policy name you should to check. Default to `*`
 
 It return the following perfdata:
 - **nbSLMPolicy**: the number of SLM policy
@@ -139,7 +139,7 @@ Command `check-transform` permit to check if tranform failed.
 If you should to check all tranform, you can put `_all` as transform name.
 
 You need to set the following parameters:
-- **--name**: The transform name
+- **--name**: The transform name. Default to `_all`.
 - **--exclude**: (optional) The transform name you should to exclude
 
 It return the following perfdata:
