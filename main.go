@@ -70,9 +70,9 @@ func run(args []string) error {
 			Category: "ISM",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:     "indice",
-					Usage:    "The indice name",
-					Required: true,
+					Name:  "indice",
+					Usage: "The indice name",
+					Value: "_all",
 				},
 				&cli.StringSliceFlag{
 					Name:  "exclude",
@@ -113,9 +113,9 @@ func run(args []string) error {
 			Category: "Indice",
 			Flags: []cli.Flag{
 				&cli.StringFlag{
-					Name:     "indice",
-					Usage:    "The indice name",
-					Required: true,
+					Name:  "indice",
+					Usage: "The indice name",
+					Value: "_all",
 				},
 			},
 			Action: check.CheckIndiceLocked,
@@ -128,6 +128,7 @@ func run(args []string) error {
 				&cli.StringFlag{
 					Name:  "name",
 					Usage: "The transform id or empty for check all transform",
+					Value: "_all",
 				},
 				&cli.StringSliceFlag{
 					Name:  "exclude",
