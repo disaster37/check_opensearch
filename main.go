@@ -102,6 +102,7 @@ func run(args []string) error {
 				&cli.StringFlag{
 					Name:  "name",
 					Usage: "The policy name",
+					Value: "*",
 				},
 			},
 			Action: check.CheckSLMPolicy,
