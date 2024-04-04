@@ -1,5 +1,5 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/disaster37/check_opensearch)](https://goreportcard.com/report/github.com/disaster37/check_opensearch)
-[![GoDoc](https://godoc.org/github.com/disaster37/check_opensearch?status.svg)](http://godoc.org/github.com/disaster37/check_opensearch)
+[![Go Report Card](https://goreportcard.com/badge/github.com/disaster37/check_opensearch/v2)](https://goreportcard.com/report/github.com/disaster37/check_opensearch/v2)
+[![GoDoc](https://godoc.org/github.com/disaster37/check_opensearch?status.svg)](http://godoc.org/github.com/disaster37/check_opensearch/v2)
 [![codecov](https://codecov.io/gh/disaster37/check_opensearch/branch/2.x/graph/badge.svg)](https://codecov.io/gh/disaster37/check_opensearch/branch/2.x)
 
 
