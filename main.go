@@ -4,7 +4,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/disaster37/check_opensearch/check"
+	"github.com/disaster37/check_opensearch/v2/check"
 	nagiosPlugin "github.com/disaster37/go-nagios"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"

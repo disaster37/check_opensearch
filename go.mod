@@ -1,4 +1,4 @@
-module github.com/disaster37/check_opensearch
+module github.com/disaster37/check_opensearch/v2
 
 go 1.20
 
