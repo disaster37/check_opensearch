@@ -52,6 +52,7 @@ func NewCheck(URL string, username string, password string, disableTLSVerificati
 		URLs:        []string{URL},
 		Sniff:       ptr.To[bool](false),
 		Healthcheck: ptr.To[bool](false),
+		Logger:      log.StandardLogger(),
 	}
 	if username != "" && password != "" {
 		cfg.Username = username
