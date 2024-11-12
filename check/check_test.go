@@ -18,19 +18,14 @@ type CheckESTestSuite struct {
 }
 
 func (s *CheckESTestSuite) SetupSuite() {
-
 	// Init logger
 	logrus.SetFormatter(new(prefixed.TextFormatter))
 	logrus.SetLevel(logrus.DebugLevel)
 
 	// Init client
-	url := os.Getenv("OPENSEARCH_URL")
 	username := os.Getenv("OPENSEARCH_USERNAME")
 	password := os.Getenv("OPENSEARCH_PASSWORD")
 
-	if url == "" {
-		url = "https://127.0.0.1:9200"
-	}
 	if username == "" {
 		username = "admin"
 	}
@@ -38,7 +33,7 @@ func (s *CheckESTestSuite) SetupSuite() {
 		password = "vLPeJYa8.3RqtZCcAK6jNz"
 	}
 
-	checkOpensearch, err := NewCheck(url, username, password, true)
+	checkOpensearch, err := NewCheck("https://opensearch.svc:9200", username, password, true)
 	if err != nil {
 		panic(err)
 	}
@@ -168,7 +163,6 @@ func (s *CheckESTestSuite) SetupSuite() {
 	}).Do(context.Background()); err != nil {
 		panic(err)
 	}
-
 }
 
 func (s *CheckESTestSuite) TearDownSuite() {
@@ -191,9 +185,7 @@ func (s *CheckESTestSuite) TearDownSuite() {
 }
 
 func (s *CheckESTestSuite) SetupTest() {
-
 	// Do somethink before each test
-
 }
 
 func TestCheckESTestSuite(t *testing.T) {

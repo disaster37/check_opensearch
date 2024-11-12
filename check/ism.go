@@ -12,7 +12,6 @@ import (
 
 // CheckISMError Wrap cli argument and call check
 func CheckISMError(c *cli.Context) error {
-
 	monitor, err := manageOpensearchGlobalParameters(c)
 	if err != nil {
 		return err
@@ -25,11 +24,9 @@ func CheckISMError(c *cli.Context) error {
 	monitoringData.ToSdtOut()
 
 	return nil
-
 }
 
 func (h *DefaultCheck) CheckISMError(indiceName string, excludeIndices []string) (res *nagiosPlugin.Monitoring, err error) {
-
 	log.Debugf("IndiceName: %s", indiceName)
 	log.Debugf("ExcludeIndices: %+v", excludeIndices)
 	monitoringData := nagiosPlugin.NewMonitoring()

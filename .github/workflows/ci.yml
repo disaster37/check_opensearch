@@ -1,77 +1,30 @@
-name: 'build'
+name: "build"
 
 on:
   push:
     branches:
-      - 2.x
       - main
+      - 2.x
     tags:
-      - '*'
+      - "*"
   pull_request:
-      branches:
-        - 2.x
-        - main
-
-permissions:
-  contents: write
+    branches:
+      - main
+      - 2.x
 
 jobs:
-  # The "build" workflow
   build:
-    # The type of runner that the job will run on
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
-    - uses: KengoTODA/actions-setup-docker-compose@main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    # Setup Go
-    - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '1.22' # The Go version to download (if necessary) and use.
-    # Run build of the application
-    - name: Run build
-      run: go build
-    # Run vet & lint on the code
-    - name: golangci-lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
-    - name: Run Opensearch
-      run: |
-        set -e
-        docker-compose up &
-        until $(curl --output /dev/null --silent --head --fail -k -u admin:vLPeJYa8.3RqtZCcAK6jNz https://localhost:9200); do echo "wait opensearch" && sleep 5; done
-        curl --fail -XGET -k -u admin:vLPeJYa8.3RqtZCcAK6jNz "https://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=500s"
-    - name: Run test
-      run: make test
-    - uses: codecov/codecov-action@v4
-      with:
-        files: coverage.txt
-        flags: unittests
-        fail_ci_if_error: true
-        token: ${{ secrets.CODECOV_TOKEN }}
-
-  release:
-    needs: [build] # Only run this workflow when "build" workflow succeeds
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Go
-        uses: actions/setup-go@v2
+      - uses: actions/checkout@v2
+      - name: Call Dagger Function
+        uses: dagger/dagger-for-github@v7
         with:
-          go-version: '1.22'
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          distribution: goreleaser
-          version: latest
-          args: release --clean
+          version: "latest"
+          verb: call
+          args: --src . ci --ci --version ${{ github.ref_name }} --code-cove-token env:CODECOV_TOKEN --git-token env:GITHUB_TOKEN
         env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

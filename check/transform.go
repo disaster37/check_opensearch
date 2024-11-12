@@ -12,7 +12,6 @@ import (
 
 // CheckILMError Wrap cli argument and call check
 func CheckTransformError(c *cli.Context) error {
-
 	monitorES, err := manageOpensearchGlobalParameters(c)
 	if err != nil {
 		return err
@@ -25,7 +24,6 @@ func CheckTransformError(c *cli.Context) error {
 	monitoringData.ToSdtOut()
 
 	return nil
-
 }
 
 func (h *DefaultCheck) CheckTransformError(transformName string, excludeTransforms []string) (monitoringData *nagiosPlugin.Monitoring, err error) {

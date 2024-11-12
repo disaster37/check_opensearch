@@ -13,7 +13,6 @@ import (
 
 // CheckSLMError wrap command line to check
 func CheckSMError(c *cli.Context) error {
-
 	monitor, err := manageOpensearchGlobalParameters(c)
 	if err != nil {
 		return err
@@ -29,8 +28,7 @@ func CheckSMError(c *cli.Context) error {
 }
 
 // CheckSLMPolicy wrap command line to check
-func CheckSLMPolicy(c *cli.Context) error {
-
+func CheckSMPolicy(c *cli.Context) error {
 	monitorES, err := manageOpensearchGlobalParameters(c)
 	if err != nil {
 		return err
@@ -43,12 +41,10 @@ func CheckSLMPolicy(c *cli.Context) error {
 	monitoringData.ToSdtOut()
 
 	return nil
-
 }
 
 // CheckSMError check that there are no SM policy failed on repository
 func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosPlugin.Monitoring, err error) {
-
 	log.Debugf("snapshotRepositoryName: %s", snapshotRepositoryName)
 	monitoringData := nagiosPlugin.NewMonitoring()
 
@@ -157,7 +153,6 @@ func (h *DefaultCheck) CheckSMError(snapshotRepositoryName string) (res *nagiosP
 }
 
 func (h *DefaultCheck) CheckSMPolicy(policyName string) (res *nagiosPlugin.Monitoring, err error) {
-
 	log.Debugf("policyName: %s", policyName)
 	monitoringData := nagiosPlugin.NewMonitoring()
 

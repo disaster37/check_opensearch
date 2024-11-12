@@ -28,18 +28,15 @@ type Check interface {
 }
 
 func manageOpensearchGlobalParameters(c *cli.Context) (Check, error) {
-
 	if c.String("url") == "" {
 		return nil, errors.New("You must set --url parameter")
 	}
 
 	return NewCheck(c.String("url"), c.String("user"), c.String("password"), c.Bool("self-signed-certificate"))
-
 }
 
 // NewCheck permit to initialize connexion on Opensearch cluster
 func NewCheck(URL string, username string, password string, disableTLSVerification bool) (Check, error) {
-
 	if URL == "" {
 		return nil, errors.New("URL can't be empty")
 	}

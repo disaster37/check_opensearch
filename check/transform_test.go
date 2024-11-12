@@ -6,7 +6,6 @@ import (
 )
 
 func (s *CheckESTestSuite) TestCheckTransformError() {
-
 	// When check all transform
 	monitoringData, err := s.check.CheckTransformError("_all", []string{})
 	assert.NoError(s.T(), err)
@@ -30,5 +29,4 @@ func (s *CheckESTestSuite) TestCheckTransformError() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), monitoringData)
 	assert.Equal(s.T(), nagiosPlugin.STATUS_UNKNOWN, monitoringData.Status())
-
 }

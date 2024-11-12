@@ -6,7 +6,6 @@ import (
 )
 
 func (s *CheckESTestSuite) TestCheckIndiceLocked() {
-
 	// When check all indices
 	monitoringData, err := s.check.CheckIndiceLocked("_all")
 	assert.NoError(s.T(), err)

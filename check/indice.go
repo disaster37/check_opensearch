@@ -12,7 +12,6 @@ import (
 
 // CheckIndiceLocked wrap command line to check
 func CheckIndiceLocked(c *cli.Context) error {
-
 	monitorES, err := manageOpensearchGlobalParameters(c)
 	if err != nil {
 		return err
@@ -25,11 +24,9 @@ func CheckIndiceLocked(c *cli.Context) error {
 	monitoringData.ToSdtOut()
 
 	return nil
-
 }
 
 func (h *DefaultCheck) CheckIndiceLocked(indiceName string) (monitoringData *nagiosPlugin.Monitoring, err error) {
-
 	if indiceName == "" {
 		return nil, errors.New("IndiceName can't be empty")
 	}

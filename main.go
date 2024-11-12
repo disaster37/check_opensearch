@@ -19,7 +19,6 @@ var (
 )
 
 func run(args []string) error {
-
 	// Logger setting
 	formatter := new(prefixed.TextFormatter)
 	formatter.FullTimestamp = true
@@ -105,7 +104,7 @@ func run(args []string) error {
 					Value: "*",
 				},
 			},
-			Action: check.CheckSLMPolicy,
+			Action: check.CheckSMPolicy,
 		},
 		{
 			Name:     "check-indice-locked",
@@ -140,7 +139,6 @@ func run(args []string) error {
 	}
 
 	app.Before = func(c *cli.Context) error {
-
 		if c.Bool("debug") {
 			log.SetLevel(log.DebugLevel)
 		}

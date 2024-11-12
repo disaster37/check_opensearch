@@ -6,7 +6,6 @@ import (
 )
 
 func (s *CheckESTestSuite) TestCheckSMError() {
-
 	// When reposiotry exist
 	monitoringData, err := s.check.CheckSMError("snapshot")
 	assert.NoError(s.T(), err)
@@ -21,7 +20,6 @@ func (s *CheckESTestSuite) TestCheckSMError() {
 }
 
 func (s *CheckESTestSuite) TestCheckSLMPolicy() {
-
 	// When policy exist
 	monitoringData, err := s.check.CheckSMPolicy("*")
 	assert.NoError(s.T(), err)
