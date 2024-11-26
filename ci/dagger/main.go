@@ -48,7 +48,6 @@ func New(
 	// +required
 	src *dagger.Directory,
 ) (*CheckOpensearch, error) {
-
 	return &CheckOpensearch{
 		Src:          src,
 		GolangModule: dag.Golang(src),
